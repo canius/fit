@@ -8,8 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		5758854C1E63FACB007C83C7 /* mpfit.c in Sources */ = {isa = PBXBuildFile; fileRef = 5758854A1E63FACB007C83C7 /* mpfit.c */; };
-		575885531E640DD6007C83C7 /* generator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 575885511E640DD6007C83C7 /* generator.cpp */; };
+		575885531E640DD6007C83C7 /* runner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 575885511E640DD6007C83C7 /* runner.cpp */; };
 		575885541E640E58007C83C7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 575885431E63FAAC007C83C7 /* main.cpp */; };
+		575885571E641216007C83C7 /* fit.c in Sources */ = {isa = PBXBuildFile; fileRef = 575885551E641216007C83C7 /* fit.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -30,8 +31,10 @@
 		5758854A1E63FACB007C83C7 /* mpfit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mpfit.c; sourceTree = "<group>"; };
 		5758854B1E63FACB007C83C7 /* mpfit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mpfit.h; sourceTree = "<group>"; };
 		5758854D1E63FAE4007C83C7 /* testmpfit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testmpfit.c; sourceTree = "<group>"; };
-		575885511E640DD6007C83C7 /* generator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = generator.cpp; sourceTree = "<group>"; };
-		575885521E640DD6007C83C7 /* generator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = generator.hpp; sourceTree = "<group>"; };
+		575885511E640DD6007C83C7 /* runner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runner.cpp; sourceTree = "<group>"; };
+		575885521E640DD6007C83C7 /* runner.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = runner.hpp; sourceTree = "<group>"; };
+		575885551E641216007C83C7 /* fit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fit.c; sourceTree = "<group>"; };
+		575885561E641216007C83C7 /* fit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fit.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,9 +70,11 @@
 				5758854D1E63FAE4007C83C7 /* testmpfit.c */,
 				5758854A1E63FACB007C83C7 /* mpfit.c */,
 				5758854B1E63FACB007C83C7 /* mpfit.h */,
+				575885551E641216007C83C7 /* fit.c */,
+				575885561E641216007C83C7 /* fit.h */,
+				575885511E640DD6007C83C7 /* runner.cpp */,
+				575885521E640DD6007C83C7 /* runner.hpp */,
 				575885431E63FAAC007C83C7 /* main.cpp */,
-				575885511E640DD6007C83C7 /* generator.cpp */,
-				575885521E640DD6007C83C7 /* generator.hpp */,
 			);
 			path = fit;
 			sourceTree = "<group>";
@@ -133,7 +138,8 @@
 			files = (
 				5758854C1E63FACB007C83C7 /* mpfit.c in Sources */,
 				575885541E640E58007C83C7 /* main.cpp in Sources */,
-				575885531E640DD6007C83C7 /* generator.cpp in Sources */,
+				575885531E640DD6007C83C7 /* runner.cpp in Sources */,
+				575885571E641216007C83C7 /* fit.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,6 +266,7 @@
 				575885491E63FAAC007C83C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

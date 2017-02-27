@@ -3,15 +3,14 @@
 //  fit
 //
 //  Created by canius.chu on 27/2/2017.
-//  Copyright © 2017 EF. All rights reserved.
+//  Copyright © 2017 canius.chu. All rights reserved.
 //
 
 #include <iostream>
-#include "mpfit.h"
-#include "generator.hpp"
+#include "runner.hpp"
 
 int main(int argc, const char * argv[]) {
 
-    test();
+    run(10);
     return 0;
 }

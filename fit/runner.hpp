@@ -1,9 +1,9 @@
 //
-//  generator.hpp
+//  runner.hpp
 //  fit
 //
 //  Created by canius.chu on 27/2/2017.
-//  Copyright © 2017 EF. All rights reserved.
+//  Copyright © 2017 canius.chu. All rights reserved.
 //
 
 #ifndef generator_hpp
@@ -11,6 +11,6 @@
 
 #include <stdio.h>
 
-void test();
+void run(int n);
 
-#endif /* generator_hpp */
+#endif /* runner_hpp */
