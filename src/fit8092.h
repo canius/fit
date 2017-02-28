@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-double calculate8092(double x,double a,double b,double c,double d,double e);
-double calculate8092reverse(double y,double a,double b,double c,double d,double e);
 double fit8092(double *x,double *y,double *ey,int n,double inputY);
 
 #ifdef __cplusplus

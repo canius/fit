@@ -21,12 +21,12 @@ struct vars_struct {
     double *ey;
 };
 
-inline double calculate8092(double x,double a,double b,double c,double d,double e)
+double calculate8092(double x,double a,double b,double c,double d,double e)
 {
     return a + b * (1 - pow((1 + exp((x + d*log(pow(2, 1/e)-1) - c)/d)),-e));
 }
 
-inline double calculate8092reverse(double y,double a,double b,double c,double d,double e)
+double calculate8092reverse(double y,double a,double b,double c,double d,double e)
 {
     return c + d * (log(pow(b / (a + b - y), 1/e) - 1) - log(pow(2, 1/e)-1));
 }
