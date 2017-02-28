@@ -13,6 +13,7 @@
 #include <map>
 #include <random>
 #include <cmath>
+#include <algorithm>
 #include <thread>
 #include "fit.h"
 
