@@ -1,12 +1,12 @@
 //
-//  fit.c
+//  fit8092.c
 //  fit
 //
 //  Created by canius.chu on 27/2/2017.
 //  Copyright © 2017 canius.chu. All rights reserved.
 //
 
-#include "fit.h"
+#include "fit8092.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

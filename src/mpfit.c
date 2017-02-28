@@ -934,7 +934,7 @@ int mpfit(mp_func funct, int m, int npar,
   }      
 
   if (result) {
-    strcpy(result->version, MPFIT_VERSION);
+    //strcpy(result->version, MPFIT_VERSION);
     result->bestnorm = mp_dmax1(fnorm,fnorm1);
     result->bestnorm *= result->bestnorm;
     result->orignorm = orignorm;

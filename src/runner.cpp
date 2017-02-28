@@ -15,7 +15,7 @@
 #include <cmath>
 #include <algorithm>
 #include <thread>
-#include "fit.h"
+#include "fit8092.h"
 
 //static inline double generate_min(std::normal_distribution<> &d,std::mt19937 &gen,double min)
 //{
