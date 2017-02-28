@@ -13,6 +13,7 @@
 #include <map>
 #include <random>
 #include <cmath>
+#include <thread>
 #include "fit.h"
 
 //static inline double generate_min(std::normal_distribution<> &d,std::mt19937 &gen,double min)
@@ -71,21 +72,55 @@ double **generate(int n)
     return  data;
 }
 
-void run(int n)
+void thread_call(int tid,double *x,double *ey,double **p,double *r,int n)
 {
-    std::cout << n*sizeof(double)*8.0/1024.0/1024.0 << std::endl;
+    int i = 0;
+    do {
+        double *y = *p;
+        *r = fit8092(x, y, ey, 8, 50.0);
+        delete y;
+        p++;
+        r++;
+    } while (++i < n);
+}
+
+void calculate(int n,double *result)
+{
     double x[8] = {1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22};
     double ey[8] = {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01};
     
     double **yset = generate(n);
-    double outputX;
-    int i = 0;
-    do {
-        double *y = *yset;
-        outputX = fit8092(x, y, ey, 8, 50.0);
-        delete y;
-        yset++;
-    } while (i++ < n);
+
+    const int num_threads = 8;
+    std::thread threads[num_threads];
     
+    int sub_num = n / num_threads;
+    int last_num = n - (num_threads - 1) * sub_num;
+    double **p = yset;
+    double *r = result;
+    
+    for (int i = 0; i < num_threads; ++i) {
+        threads[i] = std::thread(thread_call,i,x,ey,p,r,sub_num);
+        int step = i == num_threads - 1 ? last_num : sub_num;
+        p += step;
+        r += step;
+    }
+    
+    for (int i = 0; i < num_threads; ++i) {
+        threads[i].join();
+    }
+
     delete [] yset;
+}
+
+void run(int n)
+{
+    double *result = new double[n];
+    calculate(n, result);
+    std::sort(result, result + n);
+    int skip = 0.025 * n;
+    double min = result[skip];
+    double max = result[n - skip];
+    std::cout << min << " ~ " << max << std::endl;
+    delete [] result;
 }

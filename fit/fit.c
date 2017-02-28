@@ -51,7 +51,7 @@ int func8092(int m, int n, double *p, double *dy, double **dvec, void *vars)
 
 double fit8092(double *x,double *y,double *ey,int n,double inputY)
 {
-    double p[5] = {1.0, 1.0, 1.0, 1.0, 1.0};
+    double p[5] = {1.0, 1.0, 1.0, 1.0, 0.1};
     double perror[5];
     struct vars_struct v;
     int status;
