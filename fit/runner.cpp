@@ -15,6 +15,24 @@
 #include <cmath>
 #include "fit.h"
 
+//static inline double generate_min(std::normal_distribution<> &d,std::mt19937 &gen,double min)
+//{
+//    double r;
+//    do {
+//        r = d(gen);
+//    } while (r < min);
+//    return r;
+//}
+//
+//static inline double generate_max(std::normal_distribution<> &d,std::mt19937 &gen,double max)
+//{
+//    double r;
+//    do {
+//        r = d(gen);
+//    } while (r > max);
+//    return r;
+//}
+
 void run(int n)
 {
     std::random_device rd;
@@ -28,16 +46,17 @@ void run(int n)
     std::mt19937 gen7(rd());
     std::mt19937 gen8(rd());
     
-    std::normal_distribution<> d1(0.95,0.05);
-    std::normal_distribution<> d2(0.875,0.04);
-    std::normal_distribution<> d3(0.65,0.03);
-    std::normal_distribution<> d4(0.5,0.02);
-    std::normal_distribution<> d5(0.15,0.01);
-    std::normal_distribution<> d6(0.05,0.01);
-    std::normal_distribution<> d7(0.005,0.001);
-    std::normal_distribution<> d8(0.001,0.0001);
+    std::normal_distribution<> d1(95,5);
+    std::normal_distribution<> d2(87.5,4);
+    std::normal_distribution<> d3(65,3);
+    std::normal_distribution<> d4(50,2);
+    std::normal_distribution<> d5(15,1);
+    std::normal_distribution<> d6(5,1);
+    std::normal_distribution<> d7(0.5,0.1);
+    std::normal_distribution<> d8(0.1,0.01);
     
     double x[8] = {1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22};
+    double ey[8] = {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01};
     double y[8];
     double outputX;
     
@@ -50,7 +69,7 @@ void run(int n)
         y[5] = d6(gen6);
         y[6] = d7(gen7);
         y[7] = d8(gen8);
-        outputX = fit8092(x, y, 8, 0.5);
+        outputX = fit8092(x, y, ey, 8, 50.0);
         std::cout << outputX << std::endl << std::endl;
     }
 }
