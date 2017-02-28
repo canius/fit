@@ -11,6 +11,6 @@
 
 int main(int argc, const char * argv[]) {
 
-    run(100000);
+    run(1000000);
     return 0;
 }

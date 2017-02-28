@@ -33,7 +33,7 @@
 //    return r;
 //}
 
-void run(int n)
+double **generate(int n)
 {
     std::random_device rd;
     
@@ -55,12 +55,9 @@ void run(int n)
     std::normal_distribution<> d7(0.5,0.1);
     std::normal_distribution<> d8(0.1,0.01);
     
-    double x[8] = {1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22};
-    double ey[8] = {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01};
-    double y[8];
-    double outputX;
-    
+    double **data = new double*[n];
     for (int i = 0; i < n; ++i) {
+        double *y = new double[8];
         y[0] = d1(gen1);
         y[1] = d2(gen2);
         y[2] = d3(gen3);
@@ -69,7 +66,26 @@ void run(int n)
         y[5] = d6(gen6);
         y[6] = d7(gen7);
         y[7] = d8(gen8);
-        outputX = fit8092(x, y, ey, 8, 50.0);
-        std::cout << outputX << std::endl << std::endl;
+        data[i] = y;
     }
+    return  data;
+}
+
+void run(int n)
+{
+    std::cout << n*sizeof(double)*8.0/1024.0/1024.0 << std::endl;
+    double x[8] = {1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22};
+    double ey[8] = {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01};
+    
+    double **yset = generate(n);
+    double outputX;
+    int i = 0;
+    do {
+        double *y = *yset;
+        outputX = fit8092(x, y, ey, 8, 50.0);
+        delete y;
+        yset++;
+    } while (i++ < n);
+    
+    delete [] yset;
 }
