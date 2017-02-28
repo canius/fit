@@ -152,15 +152,12 @@
     <ClInclude Include="..\..\src\fit8092.h" />
     <ClInclude Include="..\..\src\mpfit.h" />
     <ClInclude Include="..\..\src\runner.hpp" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\fit8092.c" />
+    <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\mpfit.c" />
     <ClCompile Include="..\..\src\runner.cpp" />
-    <ClCompile Include="fit.cpp" />
-    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
