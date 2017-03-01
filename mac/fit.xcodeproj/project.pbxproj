@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5758854C1E63FACB007C83C7 /* mpfit.c in Sources */ = {isa = PBXBuildFile; fileRef = 5758854A1E63FACB007C83C7 /* mpfit.c */; };
-		575885531E640DD6007C83C7 /* runner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 575885511E640DD6007C83C7 /* runner.cpp */; };
-		575885541E640E58007C83C7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 575885431E63FAAC007C83C7 /* main.cpp */; };
-		575885571E641216007C83C7 /* fit.c in Sources */ = {isa = PBXBuildFile; fileRef = 575885551E641216007C83C7 /* fit.c */; };
+		57C499D51E6664E100921C5C /* fit8092.c in Sources */ = {isa = PBXBuildFile; fileRef = 57C499CE1E6664E100921C5C /* fit8092.c */; };
+		57C499D61E6664E100921C5C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 57C499D01E6664E100921C5C /* main.cpp */; };
+		57C499D71E6664E100921C5C /* mpfit.c in Sources */ = {isa = PBXBuildFile; fileRef = 57C499D11E6664E100921C5C /* mpfit.c */; };
+		57C499D81E6664E100921C5C /* runner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 57C499D31E6664E100921C5C /* runner.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,13 +27,13 @@
 
 /* Begin PBXFileReference section */
 		575885401E63FAAC007C83C7 /* fit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fit; sourceTree = BUILT_PRODUCTS_DIR; };
-		575885431E63FAAC007C83C7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		5758854A1E63FACB007C83C7 /* mpfit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mpfit.c; sourceTree = "<group>"; };
-		5758854B1E63FACB007C83C7 /* mpfit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mpfit.h; sourceTree = "<group>"; };
-		575885511E640DD6007C83C7 /* runner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = runner.cpp; sourceTree = "<group>"; };
-		575885521E640DD6007C83C7 /* runner.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = runner.hpp; sourceTree = "<group>"; };
-		575885551E641216007C83C7 /* fit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fit.c; sourceTree = "<group>"; };
-		575885561E641216007C83C7 /* fit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fit.h; sourceTree = "<group>"; };
+		57C499CE1E6664E100921C5C /* fit8092.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fit8092.c; path = ../../src/fit8092.c; sourceTree = "<group>"; };
+		57C499CF1E6664E100921C5C /* fit8092.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fit8092.h; path = ../../src/fit8092.h; sourceTree = "<group>"; };
+		57C499D01E6664E100921C5C /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../src/main.cpp; sourceTree = "<group>"; };
+		57C499D11E6664E100921C5C /* mpfit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mpfit.c; path = ../../src/mpfit.c; sourceTree = "<group>"; };
+		57C499D21E6664E100921C5C /* mpfit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mpfit.h; path = ../../src/mpfit.h; sourceTree = "<group>"; };
+		57C499D31E6664E100921C5C /* runner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = runner.cpp; path = ../../src/runner.cpp; sourceTree = "<group>"; };
+		57C499D41E6664E100921C5C /* runner.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = runner.hpp; path = ../../src/runner.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,13 +66,13 @@
 		575885421E63FAAC007C83C7 /* fit */ = {
 			isa = PBXGroup;
 			children = (
-				5758854A1E63FACB007C83C7 /* mpfit.c */,
-				5758854B1E63FACB007C83C7 /* mpfit.h */,
-				575885551E641216007C83C7 /* fit.c */,
-				575885561E641216007C83C7 /* fit.h */,
-				575885511E640DD6007C83C7 /* runner.cpp */,
-				575885521E640DD6007C83C7 /* runner.hpp */,
-				575885431E63FAAC007C83C7 /* main.cpp */,
+				57C499D11E6664E100921C5C /* mpfit.c */,
+				57C499D21E6664E100921C5C /* mpfit.h */,
+				57C499CE1E6664E100921C5C /* fit8092.c */,
+				57C499CF1E6664E100921C5C /* fit8092.h */,
+				57C499D31E6664E100921C5C /* runner.cpp */,
+				57C499D41E6664E100921C5C /* runner.hpp */,
+				57C499D01E6664E100921C5C /* main.cpp */,
 			);
 			path = fit;
 			sourceTree = "<group>";
@@ -134,10 +134,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5758854C1E63FACB007C83C7 /* mpfit.c in Sources */,
-				575885541E640E58007C83C7 /* main.cpp in Sources */,
-				575885531E640DD6007C83C7 /* runner.cpp in Sources */,
-				575885571E641216007C83C7 /* fit.c in Sources */,
+				57C499D71E6664E100921C5C /* mpfit.c in Sources */,
+				57C499D81E6664E100921C5C /* runner.cpp in Sources */,
+				57C499D61E6664E100921C5C /* main.cpp in Sources */,
+				57C499D51E6664E100921C5C /* fit8092.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
