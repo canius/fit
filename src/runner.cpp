@@ -17,6 +17,8 @@
 #include <thread>
 #include "fit8092.h"
 
+using namespace std;
+
 //static inline double generate_min(std::normal_distribution<> &d,std::mt19937 &gen,double min)
 //{
 //    double r;
@@ -90,8 +92,12 @@ void calculate(int n,double *result)
     double x[8] = {1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22};
     double ey[8] = {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01};
     
+    cout << "正在生成" << n << "组正态分布数据Y..." << endl;
+    
     double **yset = generate(n);
 
+    cout << "拟合8092曲线..." << endl;
+    
     const int num_threads = 8;
     std::thread threads[num_threads];
     
@@ -114,14 +120,64 @@ void calculate(int n,double *result)
     delete [] yset;
 }
 
+void calculate_mode(double *x,int n,vector<double> &mode,double precision)
+{
+    vector<vector<double>> modes;
+    double last = x[0];
+    vector<double> *current = nullptr;
+    
+    for (int i = 1; i < n; ++i) {
+        double value = x[i];
+        if (abs(last - value) < precision) {
+            if (current == nullptr) {
+                vector<double> b = {last,value};
+                modes.push_back(b);
+                current = &modes.back();
+            }
+            else {
+                current->push_back(value);
+            }
+        }
+        else {
+            current = nullptr;
+            last = value;
+        }
+    }
+    auto r = max_element(modes.begin(), modes.end(), [](const vector<double>& a, const vector<double>& b) {
+        return a.size() < b.size();
+    });
+    mode = *r;
+}
+
+void statistics(double *x,int n)
+{
+    double min = x[0];
+    double x25 = x[(int)(0.25*n)];
+    double x50 = x[(int)(0.50*n)];
+    double x75 = x[(int)(0.75*n)];
+    double max = x[n - 1];
+    double avg = accumulate(x, x + n, 0.0) / n;
+    vector<double> mode;
+    calculate_mode(x,n,mode,0.0001);
+
+    cout << "当Y=50%时X的结果:" << endl;
+    cout << "最小值 = " << min << endl;
+    cout << "25分位点 = " << x25 << endl;
+    cout << "中数 = " << x50 << endl;
+    cout << "75分位点 = " << x75 << endl;
+    cout << "最大值 = " << max << endl;
+    cout << "均值 = " << avg << endl;
+    cout << "众数 = " << mode.front() << " n = " << mode.size() << endl;
+}
+
 void run(int n)
 {
     double *result = new double[n];
     calculate(n, result);
     std::sort(result, result + n);
     int skip = 0.025 * n;
-    double min = result[skip];
-    double max = result[n - skip];
-    std::cout << min << " ~ " << max << std::endl;
+    statistics(result + skip, n - 2*skip);
     delete [] result;
+    cout << "请按任意键退出..." << endl;
+    getchar();
 }
