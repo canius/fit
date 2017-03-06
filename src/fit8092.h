@@ -15,7 +15,19 @@
 extern "C" {
 #endif
 
-double fit8092(double *x,double *y,double *ey,int n,double inputY);
+struct data8092_struct {
+	double *x;
+	double *y;
+	double *ey;
+	int n;
+	double *p;
+	int np;
+	double output;
+};
+
+typedef struct data8092_struct data8092;
+
+double fit8092(data8092 *data, double inputY);
 
 #ifdef __cplusplus
 } /* extern "C" */

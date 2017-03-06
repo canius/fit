@@ -43,7 +43,7 @@ static int progress;
 //    return r;
 //}
 
-double **generate(int n)
+data8092 *generate(int n)
 {
     std::random_device rd;
     
@@ -65,7 +65,11 @@ double **generate(int n)
     std::normal_distribution<> d7(0.5,0.1);
     std::normal_distribution<> d8(0.1,0.01);
     
-    double **data = new double*[n];
+	data8092 *data = new data8092[n];
+	double *x = new double[8]{ 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
+	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01 };
+
+	data8092 *p = data;
     for (int i = 0; i < n; ++i) {
         double *y = new double[8];
         y[0] = d1(gen1);
@@ -76,21 +80,38 @@ double **generate(int n)
         y[5] = d6(gen6);
         y[6] = d7(gen7);
         y[7] = d8(gen8);
-        data[i] = y;
+		p->x = x;
+		p->y = y;
+		p->ey = ey;
+		p->n = 8;
+		p->p = new double[5]{ 1.0,1.0,1.0,1.0,0.1 };
+		p->np = 5;
+		p++;
     }
-    return  data;
+    return data;
 }
 
-void thread_call(int tid,double *x,double *ey,double **p,double *r,int n,int total)
+void release(data8092 *data,int n)
+{
+	data8092 *p = data;
+	delete[] p->x;
+	delete[] p->ey;
+	for (int i = 0; i < n; ++i) {
+		delete[] p->y;
+		delete[] p->p;
+		p++;
+	}
+	delete[] data;
+}
+
+void thread_call(int tid, data8092 *data,int n,int total)
 {
 	int span = total / 100;
     int i = 0;
+	data8092 *p = data;
     do {
-        double *y = *p;
-        *r = fit8092(x, y, ey, 8, 50.0);
-        delete y;
+        p->output = fit8092(p, 50.0);
         p++;
-        r++;
 		if (counter++ > span) {
 			counter = 0;
 			cout << ++progress << "%" << endl;
@@ -98,39 +119,26 @@ void thread_call(int tid,double *x,double *ey,double **p,double *r,int n,int tot
     } while (++i < n);
 }
 
-void calculate(int n,double *result)
+void fit(data8092 *data, int n)
 {
-    double x[8] = {1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22};
-    double ey[8] = {0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01};
-    
-    cout << "正在生成" << n << "组正态分布数据Y..." << endl;
-    
-    double **yset = generate(n);
+	cout << "拟合8092曲线..." << endl;
 
-    cout << "拟合8092曲线..." << endl;
-    
-    const int num_threads = 8;
-    std::thread threads[num_threads];
-    
-    int sub_num = n / num_threads;
-    int last_num = n - (num_threads - 1) * sub_num;
-    double **p = yset;
-    double *r = result;
-    
+	const int num_threads = 8;
+	std::thread threads[num_threads];
+
+	int sub_num = n / num_threads;
+	int last_num = n - (num_threads - 1) * sub_num;
+	data8092 *p = data;
 	counter = 0;
+	for (int i = 0; i < num_threads; ++i) {
+		threads[i] = std::thread(thread_call, i, p, sub_num, n);
+		int step = i == num_threads - 1 ? last_num : sub_num;
+		p += step;
+	}
 
-    for (int i = 0; i < num_threads; ++i) {
-        threads[i] = std::thread(thread_call,i,x,ey,p,r,sub_num,n);
-        int step = i == num_threads - 1 ? last_num : sub_num;
-        p += step;
-        r += step;
-    }
-    
-    for (int i = 0; i < num_threads; ++i) {
-        threads[i].join();
-    }
-
-    delete [] yset;
+	for (int i = 0; i < num_threads; ++i) {
+		threads[i].join();
+	}
 }
 
 void calculate_mode(double *x,int n,vector<double> &mode,double precision)
@@ -162,25 +170,40 @@ void calculate_mode(double *x,int n,vector<double> &mode,double precision)
     mode = *r;
 }
 
-void statistics(double *x,int n, ofstream &file)
+void statistics(data8092 *data, int n, ofstream &file)
 {
-    double min = x[0];
-    double x25 = x[(int)(0.25*n)];
-    double x50 = x[(int)(0.50*n)];
-    double x75 = x[(int)(0.75*n)];
-    double max = x[n - 1];
-    double avg = accumulate(x, x + n, 0.0) / n;
-    vector<double> mode;
-    calculate_mode(x,n,mode,0.0001);
+	double *x = new double[n];
+	data8092 *p = data;
+	for (int i = 0; i < n; ++i) {
+		x[i] = p->output;
+		p++;
+	}
 
-    cout << "当Y=50%时X的结果:" << endl;
-    cout << "最小值 = " << min << endl;
-    cout << "25分位点 = " << x25 << endl;
-    cout << "中数 = " << x50 << endl;
-    cout << "75分位点 = " << x75 << endl;
-    cout << "最大值 = " << max << endl;
-    cout << "均值 = " << avg << endl;
-    cout << "众数 = " << mode.front() << " n = " << mode.size() << endl;
+	double min = x[0];
+	double x25 = x[(int)(0.25*n)];
+	double x50 = x[(int)(0.50*n)];
+	double x75 = x[(int)(0.75*n)];
+	double max = x[n - 1];
+	double mean = accumulate(x, x + n, 0.0) / n;
+
+	double sd = 0;
+	for (int i = 0; i < n; ++i) {
+		sd += pow(x[i] - mean, 2);
+	}
+	sd = sqrt(sd / mean);
+
+	vector<double> mode;
+	calculate_mode(x, n, mode, 0.0001);
+
+	cout << "当Y=50%时X的结果:" << endl;
+	cout << "最小值 = " << min << endl;
+	cout << "25分位点 = " << x25 << endl;
+	cout << "中数 = " << x50 << endl;
+	cout << "75分位点 = " << x75 << endl;
+	cout << "最大值 = " << max << endl;
+	cout << "众数 = " << mode.front() << " n = " << mode.size() << endl;
+	cout << "均值 = " << mean << endl;
+	cout << "标准差 = " << sd << endl;
 
 	cout << "写入文件..." << endl;
 
@@ -190,25 +213,53 @@ void statistics(double *x,int n, ofstream &file)
 	file << u8"中数 = " << x50 << endl;
 	file << u8"75分位点 = " << x75 << endl;
 	file << u8"最大值 = " << max << endl;
-	file << u8"均值 = " << avg << endl;
-	file << u8"众数 = " << mode.front() << " n = " << mode.size() << endl << endl;
+	file << u8"众数 = " << mode.front() << " n = " << mode.size() << endl;
+	file << u8"均值 = " << mean << endl;
+	file << u8"标准差 = " << sd << endl;
+	file << endl;
+	file << u8"正态分布生成参数:" << endl;
+	file << "x1 = " << data->x[0] << " y1 = 95 +- 5" << endl; 
+	file << "x2 = " << data->x[1] << " y2 = 87.5 +- 4" << endl;
+	file << "x3 = " << data->x[2] << " y3 = 65 +- 3" << endl;
+	file << "x4 = " << data->x[3] << " y4 = 50 +- 2" << endl;
+	file << "x5 = " << data->x[4] << " y5 = 15 +- 1" << endl;
+	file << "x6 = " << data->x[5] << " y6 = 5 +- 1" << endl;
+	file << "x7 = " << data->x[6] << " y7 = 0.5 +- 0.1" << endl;
+	file << "x8 = " << data->x[7] << " y8 = 0.1 +- 0.01" << endl;
+	file << endl;
 
+	file << u8"生成数据:" << endl;
+	p = data;
 	for (int i = 0; i < n; i++) {
-		file << x[i] << endl;
+		file << "x=" << p->output << " a=" << p->p[0] << " b=" << p->p[1] << " c=" << p->p[2] << " d=" << p->p[3] << " e=" << p->p[4] << " ";
+		for (int y = 0; y < p->n; y++) {
+			file << "y" << y + 1 << "=" << p->y[y] << " ";
+		}
+		file << endl;
+		p++;
 	}
+
+	delete[] x;
 }
 
 void run(int n)
 {
-	double *result = new double[n];
-	calculate(n, result);
-	double *p = partition(result, result + n, static_cast<bool(*)(double)>(isnan));
+	cout << "正在生成" << n << "组正态分布数据Y..." << endl;
+	data8092 *data = generate(n);
+	fit(data, n);
 
-	cout << "过滤溢出值" << p - result << "个" << endl;
+	data8092 *p = partition(data, data + n, [](const data8092 & a) -> bool
+	{
+		return isnan(a.output);
+	});
+	cout << "过滤溢出值" << p - data << "个" << endl;
 
-	std::sort(p, result + n);
+	std::sort(p, data + n,[](const data8092 & a, const data8092 & b) -> bool
+	{
+		return a.output < b.output;
+	});
 
-	int total = n - (p - result);
+	int total = n - (p - data);
 	int skip = 0.025 * total;
 
 	ofstream file;
@@ -216,10 +267,11 @@ void run(int n)
 	unsigned char bom[] = { 0xEF,0xBB,0xBF };
 	file.write((char*)bom, sizeof(bom));
 
+	//statistics(data, n, file);
 	statistics(p + skip, total - 2 * skip, file);
 
-	delete[] result;
 	file.close();
+	release(data, n);
 
 	cout << "请按任意键退出..." << endl;
 	getchar();

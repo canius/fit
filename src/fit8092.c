@@ -15,12 +15,6 @@
 
 #define PRINT 0
 
-struct vars_struct {
-    double *x;
-    double *y;
-    double *ey;
-};
-
 double calculate8092(double x,double a,double b,double c,double d,double e)
 {
     return a + b * (1 - pow((1 + exp((x + d*log(pow(2, 1/e)-1) - c)/d)),-e));
@@ -34,7 +28,7 @@ double calculate8092reverse(double y,double a,double b,double c,double d,double 
 int func8092(int m, int n, double *p, double *dy, double **dvec, void *vars)
 {
     int i;
-    struct vars_struct *v = (struct vars_struct *) vars;
+	data8092 *v = (data8092 *) vars;
     double *x, *y, *ey, f;
     
     x = v->x;
@@ -49,22 +43,17 @@ int func8092(int m, int n, double *p, double *dy, double **dvec, void *vars)
     return 0;
 }
 
-double fit8092(double *x,double *y,double *ey,int n,double inputY)
+double fit8092(data8092 *data, double inputY)
 {
-    double p[5] = {1.0, 1.0, 1.0, 1.0, 0.1};
+	double *p = data->p;
     double perror[5];
-    struct vars_struct v;
     int status;
     mp_result result;
     
     memset(&result,0,sizeof(result));
     result.xerror = perror;
-    
-    v.x = x;
-    v.y = y;
-    v.ey = ey;
-    
-    status = mpfit(func8092, n, 5, p, 0, 0, (void *) &v, &result);
+
+    status = mpfit(func8092, data->n, data->np, p, 0, 0, (void *) data, &result);
 
 #if PRINT
     for (int i = 0; i < result.npar; i++) {
@@ -72,7 +61,7 @@ double fit8092(double *x,double *y,double *ey,int n,double inputY)
     }
     printf("\n");
 #endif
-    
+
     return calculate8092reverse(inputY,p[0],p[1],p[2],p[3],p[4]);
 }
 
