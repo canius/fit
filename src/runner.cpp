@@ -25,23 +25,14 @@ using namespace std;
 static std::atomic_int counter;
 static int progress;
 
-//static inline double generate_min(std::normal_distribution<> &d,std::mt19937 &gen,double min)
-//{
-//    double r;
-//    do {
-//        r = d(gen);
-//    } while (r < min);
-//    return r;
-//}
-//
-//static inline double generate_max(std::normal_distribution<> &d,std::mt19937 &gen,double max)
-//{
-//    double r;
-//    do {
-//        r = d(gen);
-//    } while (r > max);
-//    return r;
-//}
+static inline double generate_max(std::normal_distribution<> &d,std::mt19937 &gen,double max)
+{
+    double r;
+    do {
+        r = d(gen);
+    } while (r > max);
+    return r;
+}
 
 data8092 *generate(int n)
 {
@@ -67,12 +58,12 @@ data8092 *generate(int n)
     
 	data8092 *data = new data8092[n];
 	double *x = new double[8]{ 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
-	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01 };
+	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.02 };
 
 	data8092 *p = data;
     for (int i = 0; i < n; ++i) {
         double *y = new double[8];
-        y[0] = d1(gen1);
+		y[0] = generate_max(d1, gen1, 100.0);
         y[1] = d2(gen2);
         y[2] = d3(gen3);
         y[3] = d4(gen4);
@@ -111,9 +102,6 @@ void thread_call(int tid, data8092 *data,int n,int total)
 	data8092 *p = data;
     do {
         p->output = fit8092(p, 50.0);
-        if (isnan(p->output)) {
-            print(p);
-        }
         p++;
 		if (counter++ > span) {
 			counter = 0;
@@ -173,6 +161,25 @@ void calculate_mode(double *x,int n,vector<double> &mode,double precision)
     mode = *r;
 }
 
+int calculate_minWindow(double *x, int n, int size)
+{
+	int minIndex = 0;
+	double *first = x;
+	double *last = x + (size - 1);
+	double minVal = *last - *first;
+	int step = n - size;
+	for (int i = 0; i < step; i++) {
+		first++;
+		last++;
+		double val = *last - *first;
+		if (val < minVal) {
+			minVal = val;
+			minIndex = i+1;
+		}
+	}
+	return minIndex;
+}
+
 void statistics(data8092 *data, int n, ofstream &file)
 {
     if (n == 0) {
@@ -201,6 +208,11 @@ void statistics(data8092 *data, int n, ofstream &file)
 	vector<double> mode;
 	calculate_mode(x, n, mode, 0.0001);
 
+	int windowSize = ceil(0.95 * (n / 10)) * 10;
+	int windowFrom = calculate_minWindow(x, n, windowSize);
+	int windowTo = windowFrom + windowSize - 1;
+	double windowMinVal = x[windowTo] - x[windowFrom];
+
 	cout << "当Y=50%时X的结果:" << endl;
 	cout << "最小值 = " << min << endl;
 	cout << "25分位点 = " << x25 << endl;
@@ -210,8 +222,20 @@ void statistics(data8092 *data, int n, ofstream &file)
 	cout << "众数 = " << mode.front() << " n = " << mode.size() << endl;
 	cout << "均值 = " << mean << endl;
 	cout << "标准差 = " << sd << endl;
+	cout << windowSize << "范围内的最小区间 x" << windowFrom+1 << "=" << x[windowFrom] << " ~ x" << windowTo + 1 << "=" << x[windowTo] << " 差值 = " << windowMinVal << endl;
 
 	cout << "写入文件..." << endl;
+
+	file << u8"正态分布生成参数:" << endl;
+	file << "x1 = " << data->x[0] << " y1 = 95 +- 5" << endl;
+	file << "x2 = " << data->x[1] << " y2 = 87.5 +- 4" << endl;
+	file << "x3 = " << data->x[2] << " y3 = 65 +- 3" << endl;
+	file << "x4 = " << data->x[3] << " y4 = 50 +- 2" << endl;
+	file << "x5 = " << data->x[4] << " y5 = 15 +- 1" << endl;
+	file << "x6 = " << data->x[5] << " y6 = 5 +- 1" << endl;
+	file << "x7 = " << data->x[6] << " y7 = 0.5 +- 0.1" << endl;
+	file << "x8 = " << data->x[7] << " y8 = 0.1 +- 0.01" << endl;
+	file << endl;
 
 	file << u8"当Y=50%时X的结果:" << endl;
 	file << u8"最小值 = " << min << endl;
@@ -222,16 +246,7 @@ void statistics(data8092 *data, int n, ofstream &file)
 	file << u8"众数 = " << mode.front() << " n = " << mode.size() << endl;
 	file << u8"均值 = " << mean << endl;
 	file << u8"标准差 = " << sd << endl;
-	file << endl;
-	file << u8"正态分布生成参数:" << endl;
-	file << "x1 = " << data->x[0] << " y1 = 95 +- 5" << endl; 
-	file << "x2 = " << data->x[1] << " y2 = 87.5 +- 4" << endl;
-	file << "x3 = " << data->x[2] << " y3 = 65 +- 3" << endl;
-	file << "x4 = " << data->x[3] << " y4 = 50 +- 2" << endl;
-	file << "x5 = " << data->x[4] << " y5 = 15 +- 1" << endl;
-	file << "x6 = " << data->x[5] << " y6 = 5 +- 1" << endl;
-	file << "x7 = " << data->x[6] << " y7 = 0.5 +- 0.1" << endl;
-	file << "x8 = " << data->x[7] << " y8 = 0.1 +- 0.01" << endl;
+	file << windowSize << u8"范围内的最小区间 x" << windowFrom + 1 << "=" << x[windowFrom] << " ~ x" << windowTo + 1 << "=" << x[windowTo] << u8" 差值 = " << windowMinVal << endl;
 	file << endl;
 
 	delete[] x;
@@ -241,14 +256,15 @@ void run(int n)
 {
 	cout << "正在生成" << n << "组正态分布数据Y..." << endl;
 	data8092 *data = generate(n);
+	data8092 *end = data + n;
 	fit(data, n);
 
-	data8092 *p = partition(data, data + n, [](const data8092 & a) -> bool
+	data8092 *start = partition(data, end, [](const data8092 & a) -> bool
 	{
 		return isnan(a.output);
 	});
 
-	std::sort(p, data + n,[](const data8092 & a, const data8092 & b) -> bool
+	std::sort(start, end, [](const data8092 & a, const data8092 & b) -> bool
 	{
 		return a.output < b.output;
 	});
@@ -258,19 +274,16 @@ void run(int n)
 	unsigned char bom[] = { 0xEF,0xBB,0xBF };
 	file.write((char*)bom, sizeof(bom));
 
-	statistics(p, n - (int)(p - data), file);
-    
-    file << u8"生成数据:" << endl;
-    p = data;
-    for (int i = 0; i < n; i++) {
-        file << "x=" << p->output << " a=" << p->p[0] << " b=" << p->p[1] << " c=" << p->p[2] << " d=" << p->p[3] << " e=" << p->p[4] << " ";
-        for (int j = 0; j < p->n; j++) {
-            file << "y" << j + 1 << "=" << p->y[j] << " ";
-        }
-        file << endl;
-        p++;
-    }
-    
+	cout << "排除" << start - data << "个溢出值" << endl;
+	statistics(start, n - (int)(start - data), file);
+
+	file << u8"数据:" << endl;
+	data8092 *p = start;
+	while (p != end) {
+		file << "x=" << p->output << endl;
+		p++;
+	}
+
 	file.close();
 	release(data, n);
 
