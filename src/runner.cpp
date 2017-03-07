@@ -34,43 +34,38 @@ static inline double generate_max(std::normal_distribution<> &d,std::mt19937 &ge
     return r;
 }
 
-data8092 *generate(int n)
+data8092 *generate(int n, ofstream &file)
 {
-    std::random_device rd;
-    
-    std::mt19937 gen1(rd());
-    std::mt19937 gen2(rd());
-    std::mt19937 gen3(rd());
-    std::mt19937 gen4(rd());
-    std::mt19937 gen5(rd());
-    std::mt19937 gen6(rd());
-    std::mt19937 gen7(rd());
-    std::mt19937 gen8(rd());
-    
-    std::normal_distribution<> d1(95,5);
-    std::normal_distribution<> d2(87.5,4);
-    std::normal_distribution<> d3(65,3);
-    std::normal_distribution<> d4(50,2);
-    std::normal_distribution<> d5(15,1);
-    std::normal_distribution<> d6(5,1);
-    std::normal_distribution<> d7(0.5,0.1);
-    std::normal_distribution<> d8(0.1,0.01);
-    
 	data8092 *data = new data8092[n];
 	double *x = new double[8]{ 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
 	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.02 };
+	double y_min[8] = { 92.5,80.0,60.0,45.0,10.0,0.0,0.0,0.0 };
+	double y_max[8] = { 97.5,95.0,70.0,55.0,20.0,10.0,1.0,0.2 };
+
+	cout << "正在生成" << n << "组均匀分布数据Y..." << endl;
+	file << u8"均匀分布生成参数:" << endl;
+	for (int i = 0; i < 8; i++) {
+		cout << "x" << i+1 << " = " << x[i] << " y" << i+1 << " = [" << y_min[i] << "," << y_max[i] << "]" << endl;
+		file << "x" << i+1 << " = " << x[i] << " y" << i+1 << " = [" << y_min[i] << "," << y_max[i] << "]" << endl;
+	}
+	file << endl;
+
+	std::random_device rd;
+	vector<std::mt19937> gens;
+	vector<std::uniform_real_distribution<>> ds;
+	for (int i = 0; i < 8; i++) {
+		std::mt19937 gen(rd());
+		gens.push_back(gen);
+		std::uniform_real_distribution<> d(y_min[i], y_max[i]);
+		ds.push_back(d);
+	}
 
 	data8092 *p = data;
-    for (int i = 0; i < n; ++i) {
-        double *y = new double[8];
-		y[0] = generate_max(d1, gen1, 100.0);
-        y[1] = d2(gen2);
-        y[2] = d3(gen3);
-        y[3] = d4(gen4);
-        y[4] = d5(gen5);
-        y[5] = d6(gen6);
-        y[6] = d7(gen7);
-        y[7] = d8(gen8);
+	for (int i = 0; i < n; ++i) {
+		double *y = new double[8];
+		for (int i = 0; i < 8; i++) {
+			y[i] = ds[i](gens[i]);
+		}
 		p->x = x;
 		p->y = y;
 		p->ey = ey;
@@ -78,8 +73,8 @@ data8092 *generate(int n)
 		p->p = new double[5]{ 1.0,1.0,1.0,1.0,1.0 };
 		p->np = 5;
 		p++;
-    }
-    return data;
+	}
+	return data;
 }
 
 void release(data8092 *data,int n)
@@ -112,8 +107,6 @@ void thread_call(int tid, data8092 *data,int n,int total)
 
 void fit(data8092 *data, int n)
 {
-	cout << "拟合8092曲线..." << endl;
-
 	const int num_threads = 8;
 	std::thread threads[num_threads];
 
@@ -209,7 +202,7 @@ void statistics(data8092 *data, int n, ofstream &file)
 	vector<double> mode;
 	calculate_mode(x, n, mode, 0.0001);
 
-	int windowSize = ceil(0.95 * (n / 10)) * 10;
+	int windowSize = (int)ceil(0.95 * (n / 10)) * 10;
 	int windowFrom = calculate_minWindow(x, n, windowSize);
 	int windowTo = windowFrom + windowSize - 1;
 	double windowMinVal = x[windowTo] - x[windowFrom];
@@ -224,19 +217,6 @@ void statistics(data8092 *data, int n, ofstream &file)
 	cout << "均值 = " << mean << endl;
 	cout << "标准差 = " << sd << endl;
 	cout << windowSize << "范围内的最小区间 x" << windowFrom+1 << "=" << x[windowFrom] << " ~ x" << windowTo + 1 << "=" << x[windowTo] << " 差值 = " << windowMinVal << endl;
-
-	cout << "写入文件..." << endl;
-
-	file << u8"正态分布生成参数:" << endl;
-	file << "x1 = " << data->x[0] << " y1 = 95 +- 5" << endl;
-	file << "x2 = " << data->x[1] << " y2 = 87.5 +- 4" << endl;
-	file << "x3 = " << data->x[2] << " y3 = 65 +- 3" << endl;
-	file << "x4 = " << data->x[3] << " y4 = 50 +- 2" << endl;
-	file << "x5 = " << data->x[4] << " y5 = 15 +- 1" << endl;
-	file << "x6 = " << data->x[5] << " y6 = 5 +- 1" << endl;
-	file << "x7 = " << data->x[6] << " y7 = 0.5 +- 0.1" << endl;
-	file << "x8 = " << data->x[7] << " y8 = 0.1 +- 0.01" << endl;
-	file << endl;
 
 	file << u8"当Y=50%时X的结果:" << endl;
 	file << u8"最小值 = " << min << endl;
@@ -255,9 +235,15 @@ void statistics(data8092 *data, int n, ofstream &file)
 
 void run(int n)
 {
-	cout << "正在生成" << n << "组正态分布数据Y..." << endl;
-	data8092 *data = generate(n);
+	ofstream file;
+	file.open("output.txt", std::ios::out);
+	unsigned char bom[] = { 0xEF,0xBB,0xBF };
+	file.write((char*)bom, sizeof(bom));
+
+	data8092 *data = generate(n,file);
 	data8092 *end = data + n;
+
+	cout << "拟合8092曲线..." << endl;
 	fit(data, n);
 
 	data8092 *start = partition(data, end, [](const data8092 & a) -> bool
@@ -270,11 +256,6 @@ void run(int n)
 		return a.output < b.output;
 	});
 
-	ofstream file;
-	file.open("output.txt", std::ios::out);
-	unsigned char bom[] = { 0xEF,0xBB,0xBF };
-	file.write((char*)bom, sizeof(bom));
-
 	int exclude = start - data;
 	if (exclude > 0) {
 		cout << "排除" << exclude << "个溢出值" << endl;
@@ -282,6 +263,7 @@ void run(int n)
 
 	statistics(start, n - (int)(start - data), file);
 
+	cout << "写入文件..." << endl;
 	file << u8"数据:" << endl;
 	data8092 *p = start;
 	while (p != end) {
