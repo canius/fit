@@ -105,7 +105,7 @@ void thread_call(int tid, data8092 *data,int n,int total)
         p++;
 		if (counter++ > span) {
 			counter = 0;
-			cout << ++progress << "%" << endl;
+			cout << ++progress << "% ";
 		}
     } while (++i < n);
 }
@@ -130,6 +130,7 @@ void fit(data8092 *data, int n)
 	for (int i = 0; i < num_threads; ++i) {
 		threads[i].join();
 	}
+	cout << endl;
 }
 
 void calculate_mode(double *x,int n,vector<double> &mode,double precision)
@@ -274,7 +275,11 @@ void run(int n)
 	unsigned char bom[] = { 0xEF,0xBB,0xBF };
 	file.write((char*)bom, sizeof(bom));
 
-	cout << "排除" << start - data << "个溢出值" << endl;
+	int exclude = start - data;
+	if (exclude > 0) {
+		cout << "排除" << exclude << "个溢出值" << endl;
+	}
+
 	statistics(start, n - (int)(start - data), file);
 
 	file << u8"数据:" << endl;
