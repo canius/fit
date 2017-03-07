@@ -67,7 +67,7 @@ data8092 *generate(int n)
     
 	data8092 *data = new data8092[n];
 	double *x = new double[8]{ 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
-	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,1.0 };
+	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01 };
 
 	data8092 *p = data;
     for (int i = 0; i < n; ++i) {
@@ -237,38 +237,8 @@ void statistics(data8092 *data, int n, ofstream &file)
 	delete[] x;
 }
 
-double calculate_fit(double *y)
-{
-    double error = 0.01;
-    data8092 data;
-    double x[8] = { 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
-    double ey[8] = { error,error,error,error,error,error,error,0.1 };
-    double p[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
-    data.x = x;
-    data.y = y;
-    data.ey = ey;
-    data.n = 8;
-    data.p = p;
-    data.np = 5;
-    double output = fit8092(&data, 50.0);
-    for (int i = 0; i < 5; ++i) {
-        cout << data.p[i] << " ";
-    }
-    cout << endl;
-    return output;
-}
-
-void wrong_test()
-{
-    double y[8] = {91.542409750962676, 79.522345573289584, 54.383359109550653, 49.113343322319032, 14.856214592949819, 3.2337041734557759, 0.47242181348390755, 0.10179758745913106 };
-    cout << calculate_fit(y) << endl;
-}
-
 void run(int n)
 {
-//    wrong_test();
-//    return;
-
 	cout << "正在生成" << n << "组正态分布数据Y..." << endl;
 	data8092 *data = generate(n);
 	fit(data, n);
