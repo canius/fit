@@ -25,6 +25,18 @@ double calculate8092reverse(double y,double a,double b,double c,double d,double 
     return c + d * (log(pow(b / (a + b - y), 1/e) - 1) - log(pow(2, 1/e)-1));
 }
 
+void print(data8092 *data)
+{
+    for (int i = 0; i < data->n; ++i) {
+        printf("%d x=%f y=%f ey=%f\n",i+1,data->x[i],data->y[i],data->ey[i]);
+    }
+    for (int i = 0; i < data->np; ++i) {
+        printf("p%d=%f ",i,data->p[i]);
+    }
+    printf("\n");
+    printf("output=%f\n\n",data->output);
+}
+
 int func8092(int m, int n, double *p, double *dy, double **dvec, void *vars)
 {
     int i;

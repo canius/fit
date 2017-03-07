@@ -27,7 +27,11 @@ struct data8092_struct {
 
 typedef struct data8092_struct data8092;
 
+double calculate8092(double x,double a,double b,double c,double d,double e);
+double calculate8092reverse(double y,double a,double b,double c,double d,double e);
+
 double fit8092(data8092 *data, double inputY);
+void print(data8092 *data);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -67,7 +67,7 @@ data8092 *generate(int n)
     
 	data8092 *data = new data8092[n];
 	double *x = new double[8]{ 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
-	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.01 };
+	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,1.0 };
 
 	data8092 *p = data;
     for (int i = 0; i < n; ++i) {
@@ -84,7 +84,7 @@ data8092 *generate(int n)
 		p->y = y;
 		p->ey = ey;
 		p->n = 8;
-		p->p = new double[5]{ 1.0,1.0,1.0,1.0,0.1 };
+		p->p = new double[5]{ 1.0,1.0,1.0,1.0,1.0 };
 		p->np = 5;
 		p++;
     }
@@ -111,6 +111,9 @@ void thread_call(int tid, data8092 *data,int n,int total)
 	data8092 *p = data;
     do {
         p->output = fit8092(p, 50.0);
+        if (isnan(p->output)) {
+            print(p);
+        }
         p++;
 		if (counter++ > span) {
 			counter = 0;
@@ -131,8 +134,8 @@ void fit(data8092 *data, int n)
 	data8092 *p = data;
 	counter = 0;
 	for (int i = 0; i < num_threads; ++i) {
-		threads[i] = std::thread(thread_call, i, p, sub_num, n);
-		int step = i == num_threads - 1 ? last_num : sub_num;
+        int step = i == num_threads - 1 ? last_num : sub_num;
+		threads[i] = std::thread(thread_call, i, p, step, n);
 		p += step;
 	}
 
@@ -172,6 +175,9 @@ void calculate_mode(double *x,int n,vector<double> &mode,double precision)
 
 void statistics(data8092 *data, int n, ofstream &file)
 {
+    if (n == 0) {
+        return;
+    }
 	double *x = new double[n];
 	data8092 *p = data;
 	for (int i = 0; i < n; ++i) {
@@ -228,22 +234,41 @@ void statistics(data8092 *data, int n, ofstream &file)
 	file << "x8 = " << data->x[7] << " y8 = 0.1 +- 0.01" << endl;
 	file << endl;
 
-	file << u8"生成数据:" << endl;
-	p = data;
-	for (int i = 0; i < n; i++) {
-		file << "x=" << p->output << " a=" << p->p[0] << " b=" << p->p[1] << " c=" << p->p[2] << " d=" << p->p[3] << " e=" << p->p[4] << " ";
-		for (int y = 0; y < p->n; y++) {
-			file << "y" << y + 1 << "=" << p->y[y] << " ";
-		}
-		file << endl;
-		p++;
-	}
-
 	delete[] x;
+}
+
+double calculate_fit(double *y)
+{
+    double error = 0.01;
+    data8092 data;
+    double x[8] = { 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
+    double ey[8] = { error,error,error,error,error,error,error,0.1 };
+    double p[5] = { 1.0, 1.0, 1.0, 1.0, 1.0 };
+    data.x = x;
+    data.y = y;
+    data.ey = ey;
+    data.n = 8;
+    data.p = p;
+    data.np = 5;
+    double output = fit8092(&data, 50.0);
+    for (int i = 0; i < 5; ++i) {
+        cout << data.p[i] << " ";
+    }
+    cout << endl;
+    return output;
+}
+
+void wrong_test()
+{
+    double y[8] = {91.542409750962676, 79.522345573289584, 54.383359109550653, 49.113343322319032, 14.856214592949819, 3.2337041734557759, 0.47242181348390755, 0.10179758745913106 };
+    cout << calculate_fit(y) << endl;
 }
 
 void run(int n)
 {
+//    wrong_test();
+//    return;
+
 	cout << "正在生成" << n << "组正态分布数据Y..." << endl;
 	data8092 *data = generate(n);
 	fit(data, n);
@@ -252,24 +277,30 @@ void run(int n)
 	{
 		return isnan(a.output);
 	});
-	cout << "过滤溢出值" << p - data << "个" << endl;
 
 	std::sort(p, data + n,[](const data8092 & a, const data8092 & b) -> bool
 	{
 		return a.output < b.output;
 	});
 
-	int total = n - (p - data);
-	int skip = 0.025 * total;
-
 	ofstream file;
 	file.open("output.txt", std::ios::out);
 	unsigned char bom[] = { 0xEF,0xBB,0xBF };
 	file.write((char*)bom, sizeof(bom));
 
-	//statistics(data, n, file);
-	statistics(p + skip, total - 2 * skip, file);
-
+	statistics(p, n - (int)(p - data), file);
+    
+    file << u8"生成数据:" << endl;
+    p = data;
+    for (int i = 0; i < n; i++) {
+        file << "x=" << p->output << " a=" << p->p[0] << " b=" << p->p[1] << " c=" << p->p[2] << " d=" << p->p[3] << " e=" << p->p[4] << " ";
+        for (int j = 0; j < p->n; j++) {
+            file << "y" << j + 1 << "=" << p->y[j] << " ";
+        }
+        file << endl;
+        p++;
+    }
+    
 	file.close();
 	release(data, n);
 
