@@ -188,12 +188,12 @@ void statistics(data8092 *data, int n, ofstream &file)
 	for (int i = 0; i < n; ++i) {
 		sd += pow(x[i] - mean, 2);
 	}
-	sd = sqrt(sd / mean);
+	sd = sqrt(sd / (n - 1));
 
 	vector<double> mode;
 	calculate_mode(x, n, mode, 0.0001);
 
-	int windowSize = (int)ceil(0.95 * (n / 10)) * 10;
+	int windowSize = 0.95 * n;
 	int windowFrom = calculate_minWindow(x, n, windowSize);
 	int windowTo = windowFrom + windowSize - 1;
 	double windowMinVal = x[windowTo] - x[windowFrom];
@@ -220,6 +220,14 @@ void statistics(data8092 *data, int n, ofstream &file)
 	file << u8"标准差 = " << sd << endl;
 	file << windowSize << u8"范围内的最小区间 x" << windowFrom + 1 << "=" << x[windowFrom] << " ~ x" << windowTo + 1 << "=" << x[windowTo] << u8" 差值 = " << windowMinVal << endl;
 	file << endl;
+
+	cout << "写入文件..." << endl;
+	file << u8"数据:" << endl;
+	p = data;
+	for (int i = 0; i < n; i++) {
+		file << "x=" << p->output << endl;
+		p++;
+	}
 
 	delete[] x;
 }
@@ -252,15 +260,8 @@ void run(int n)
 		cout << "排除" << exclude << "个溢出值" << endl;
 	}
 
-	statistics(start, n - (int)(start - data), file);
-
-	cout << "写入文件..." << endl;
-	file << u8"数据:" << endl;
-	data8092 *p = start;
-	while (p != end) {
-		file << "x=" << p->output << endl;
-		p++;
-	}
+	int skip = n * 0.025;
+	statistics(data + skip, n - 2 * skip, file);
 
 	file.close();
 	release(data, n);
