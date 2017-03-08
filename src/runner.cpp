@@ -25,22 +25,13 @@ using namespace std;
 static std::atomic_int counter;
 static int progress;
 
-static inline double generate_max(std::normal_distribution<> &d,std::mt19937 &gen,double max)
-{
-    double r;
-    do {
-        r = d(gen);
-    } while (r > max);
-    return r;
-}
-
 data8092 *generate(int n, ofstream &file)
 {
 	data8092 *data = new data8092[n];
 	double *x = new double[8]{ 1.491,1.837,2.217,2.505,2.813,3.216,3.748,4.22 };
 	double *ey = new double[8]{ 0.01,0.01,0.01,0.01,0.01,0.01,0.01,0.02 };
-	double y_min[8] = { 92.5,80.0,60.0,45.0,10.0,0.0,0.0,0.0 };
-	double y_max[8] = { 97.5,95.0,70.0,55.0,20.0,10.0,1.0,0.2 };
+	double y_min[8] = { 92.5,85.0,62.5,47.5,13.5,4.0,0.4,0.05 };
+	double y_max[8] = { 97.5,90.0,67.5,52.5,16.5,6.0,0.6,0.15 };
 
 	cout << "正在生成" << n << "组均匀分布数据Y..." << endl;
 	file << u8"均匀分布生成参数:" << endl;
@@ -100,7 +91,7 @@ void thread_call(int tid, data8092 *data,int n,int total)
         p++;
 		if (counter++ > span) {
 			counter = 0;
-			cout << ++progress << "% ";
+            cout << ++progress << "%" << endl;
 		}
     } while (++i < n);
 }
@@ -256,7 +247,7 @@ void run(int n)
 		return a.output < b.output;
 	});
 
-	int exclude = start - data;
+	int exclude = int(start - data);
 	if (exclude > 0) {
 		cout << "排除" << exclude << "个溢出值" << endl;
 	}
